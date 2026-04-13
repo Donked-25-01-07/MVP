@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import Chat from './Chat'
 import AuthForm from './components/AuthForm'
+import MessengerApp from './MessengerApp'
 
 function App() {
   const [auth, setAuth] = useState(() => {
@@ -25,7 +25,7 @@ function App() {
     return <AuthForm onAuth={handleAuth} />
   }
 
-  return <Chat auth={auth} onLogout={logout} />
+  return <MessengerApp auth={auth} onLogout={logout} />
 }
 
 export default App

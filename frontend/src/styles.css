@@ -9,6 +9,7 @@
 body {
   margin: 0;
   background: #111;
+  color: #f2f2f2;
 }
 
 .auth-wrap {
@@ -86,6 +87,150 @@ body {
   grid-template-columns: 280px 1fr;
   background: var(--bg);
   color: var(--text);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 300px 320px 1fr;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.sidebar-left,
+.sidebar-middle {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 14px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  max-height: 100vh;
+  overflow: auto;
+}
+
+.sidebar-middle {
+  background: var(--panel-alt);
+}
+
+.section-title {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.user-pill {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-pill p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.badge {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  justify-self: start;
+}
+
+.list {
+  display: grid;
+  gap: 6px;
+}
+
+.list-item,
+.conversation {
+  background: var(--card);
+  border: 1px solid transparent;
+  color: var(--text);
+  border-radius: 9px;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conversation p {
+  color: var(--muted);
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.conversation.active {
+  border-color: var(--accent);
+}
+
+.members-pick {
+  max-height: 140px;
+  overflow: auto;
+  display: grid;
+  gap: 4px;
+  background: var(--card);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.chat-main {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.chat-main header {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+}
+
+.chat-main header h2 {
+  margin: 0;
+}
+
+.chat-main header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.message-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.message-actions button,
+.message-edit button {
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.message-edit {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
+}
+
+.message-edit input {
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: inherit;
+  padding: 6px;
 }
 
 .left-pane {
@@ -216,7 +361,8 @@ body {
 }
 
 @media (max-width: 800px) {
-  .layout {
+  .layout,
+  .app-shell {
     grid-template-columns: 1fr;
   }
 
