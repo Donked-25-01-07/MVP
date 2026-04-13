@@ -1,0 +1,43 @@
+export const themes = {
+  discordDark: {
+    name: 'Discord Dark',
+    bg: '#1e1f22',
+    panel: '#2b2d31',
+    panelAlt: '#313338',
+    text: '#dbdee1',
+    muted: '#949ba4',
+    accent: '#5865f2',
+    accentHover: '#4752c4',
+    input: '#1e1f22',
+    bubbleSelf: '#404eed',
+    bubbleOther: '#383a40',
+  },
+  midnightBlue: {
+    name: 'Midnight Blue',
+    bg: '#101722',
+    panel: '#152235',
+    panelAlt: '#1a2a42',
+    text: '#e1ebff',
+    muted: '#88a0c8',
+    accent: '#3f8cff',
+    accentHover: '#2f73d3',
+    input: '#0f1a2d',
+    bubbleSelf: '#2f73d3',
+    bubbleOther: '#203049',
+  },
+  synthWave: {
+    name: 'Synth Wave',
+    bg: '#160f24',
+    panel: '#221733',
+    panelAlt: '#2a1d40',
+    text: '#f3e9ff',
+    muted: '#ba99d6',
+    accent: '#ff4fd8',
+    accentHover: '#db3fb9',
+    input: '#170f28',
+    bubbleSelf: '#7e57ff',
+    bubbleOther: '#372450',
+  },
+}
+
+export const defaultThemeKey = 'discordDark'
