@@ -20,6 +20,10 @@ body {
   min-height: 100vh;
   color: var(--text);
   background: var(--page-bg);
+  background-image: radial-gradient(circle at 14% 18%, color-mix(in srgb, var(--accent) 18%, transparent) 0, transparent 28%),
+    radial-gradient(circle at 86% 8%, color-mix(in srgb, var(--accent) 14%, transparent) 0, transparent 22%),
+    var(--page-gradient);
+  background-attachment: fixed;
 }
 
 button,
@@ -104,11 +108,20 @@ textarea {
   grid-template-columns: minmax(290px, 360px) 1fr minmax(280px, 340px);
   background: var(--page-gradient);
   color: var(--text);
+  max-width: 1440px;
+  margin: 12px auto;
+  border: 1px solid color-mix(in srgb, var(--sidebar-border) 65%, transparent);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 26px 70px rgba(6, 12, 20, 0.45);
+  position: relative;
+  isolation: isolate;
 }
 
 .sidebar-left {
   border-right: 1px solid var(--sidebar-border);
-  background: var(--sidebar-bg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sidebar-bg) 88%, transparent), color-mix(in srgb, var(--sidebar-bg) 96%, transparent));
+  backdrop-filter: blur(14px);
   display: grid;
   grid-template-rows: auto auto minmax(220px, 1fr) auto;
   gap: 10px;
@@ -120,12 +133,18 @@ textarea {
 .sidebar-right {
   border-left: 1px solid var(--sidebar-border);
   background: color-mix(in srgb, var(--sidebar-bg) 92%, transparent);
-  display: none;
   min-width: 0;
+  transform: translateX(12px);
+  opacity: 0;
+  transition: transform 220ms ease, opacity 220ms ease;
+  backdrop-filter: blur(12px);
+  display: none;
 }
 
 .sidebar-right.open {
   display: block;
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .tg-head {
@@ -134,6 +153,7 @@ textarea {
   align-items: center;
   gap: 8px;
   position: relative;
+  padding: 6px 6px 10px;
 }
 
 .icon-btn {
@@ -146,12 +166,14 @@ textarea {
   background: color-mix(in srgb, var(--card-bg) 84%, transparent);
   color: var(--text);
   cursor: pointer;
-  transition: transform 160ms ease, background-color 160ms ease;
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
 }
 
 .icon-btn:hover {
   transform: translateY(-1px);
   background: var(--card-hover);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 .avatar-pill {
@@ -272,6 +294,7 @@ textarea {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
+  padding: 2px;
 }
 
 .folder-btn {
@@ -311,11 +334,14 @@ textarea {
   gap: 10px;
   text-align: left;
   align-items: center;
-  transition: background-color 170ms ease, border-color 170ms ease, transform 170ms ease;
+  transition: background-color 190ms ease, border-color 190ms ease, transform 190ms ease, box-shadow 190ms ease;
+  animation: cardReveal 260ms ease;
 }
 
 .conversation-card.tg-card:hover {
   background: var(--card-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--accent-soft) 45%, transparent);
 }
 
 .conversation-card.tg-card.active {
@@ -460,11 +486,12 @@ textarea {
   background-image: var(--chat-pattern);
   background-size: 22px 22px, cover;
   position: relative;
+  overflow: hidden;
 }
 
 .chat-header.tg-chat-header {
   border-bottom: 1px solid color-mix(in srgb, var(--sidebar-border) 82%, transparent);
-  background: var(--header-bg);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--header-bg) 90%, transparent), color-mix(in srgb, var(--accent-soft) 55%, transparent));
   backdrop-filter: blur(12px);
   padding: 12px 16px;
   display: grid;
@@ -510,9 +537,12 @@ textarea {
   min-height: 100%;
   max-height: 100%;
   overflow: auto;
-  padding: 14px 20px;
+  padding: 18px 24px 80px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  background: radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--accent-soft) 32%, transparent) 0, transparent 38%),
+    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--accent-soft) 26%, transparent) 0, transparent 32%),
+    var(--chat-pattern);
 }
 
 .drop-overlay {
@@ -539,6 +569,7 @@ textarea {
 .message-row {
   display: flex;
   animation: messageIn 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  gap: 6px;
 }
 
 .message-row.own {
@@ -553,7 +584,9 @@ textarea {
   max-width: min(76ch, 80%);
   border-radius: 15px;
   padding: 8px 11px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  border: 1px solid color-mix(in srgb, var(--sidebar-border) 60%, transparent);
+  backdrop-filter: blur(2px);
 }
 
 .message-row.own .message-bubble {
@@ -615,7 +648,7 @@ textarea {
   justify-content: flex-end;
   align-items: center;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 6px;
   color: var(--bubble-meta);
   font-size: 11px;
 }
@@ -730,9 +763,10 @@ textarea {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   gap: 8px;
-  background: var(--header-bg);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--header-bg) 92%, transparent), color-mix(in srgb, var(--accent-soft) 48%, transparent));
   backdrop-filter: blur(12px);
   position: relative;
+  box-shadow: 0 -12px 28px rgba(6, 12, 20, 0.26);
 }
 
 .composer textarea {
@@ -790,6 +824,7 @@ textarea {
   gap: 6px;
   padding: 8px;
   z-index: 12;
+  animation: menuIn 160ms ease;
 }
 
 .emoji-picker button {
@@ -925,6 +960,7 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
+  padding-bottom: 4px;
 }
 
 .media-tile {
@@ -954,6 +990,7 @@ textarea {
   display: grid;
   place-items: center;
   z-index: 60;
+  backdrop-filter: blur(6px);
 }
 
 .modal-card {
@@ -967,7 +1004,7 @@ textarea {
   padding: 12px;
   display: grid;
   gap: 8px;
-  animation: modalIn 200ms ease;
+  animation: modalIn 220ms ease;
 }
 
 .modal-head {
@@ -1126,11 +1163,11 @@ textarea {
 @keyframes messageIn {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(8px) scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1153,6 +1190,17 @@ textarea {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -1229,4 +1277,21 @@ textarea {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Slim scrollbars */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 40%, transparent);
+  border-radius: 12px;
+  border: 2px solid color-mix(in srgb, var(--page-bg) 80%, transparent);
+}
+
+*::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--sidebar-bg) 70%, transparent);
+  border-radius: 12px;
 }
