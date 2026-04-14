@@ -20,8 +20,8 @@ body {
   min-height: 100vh;
   color: var(--text);
   background: var(--page-bg);
-  background-image: radial-gradient(circle at 14% 18%, color-mix(in srgb, var(--accent) 18%, transparent) 0, transparent 28%),
-    radial-gradient(circle at 86% 8%, color-mix(in srgb, var(--accent) 14%, transparent) 0, transparent 22%),
+  background-image: radial-gradient(circle at 12% 16%, color-mix(in srgb, var(--accent) 20%, transparent) 0, transparent 26%),
+    radial-gradient(circle at 84% 10%, color-mix(in srgb, var(--accent) 12%, transparent) 0, transparent 18%),
     var(--page-gradient);
   background-attachment: fixed;
 }
@@ -105,39 +105,37 @@ textarea {
 .app-shell.tg-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(290px, 360px) 1fr minmax(280px, 340px);
-  background: var(--page-gradient);
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(280px, 340px);
+  background: transparent;
   color: var(--text);
-  max-width: 1440px;
+  max-width: 1480px;
   margin: 12px auto;
-  border: 1px solid color-mix(in srgb, var(--sidebar-border) 65%, transparent);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 26px 70px rgba(6, 12, 20, 0.45);
+  box-shadow: 0 28px 80px rgba(6, 12, 20, 0.35);
   position: relative;
   isolation: isolate;
 }
 
 .sidebar-left {
   border-right: 1px solid var(--sidebar-border);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--sidebar-bg) 88%, transparent), color-mix(in srgb, var(--sidebar-bg) 96%, transparent));
-  backdrop-filter: blur(14px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sidebar-bg) 94%, transparent), color-mix(in srgb, var(--sidebar-bg) 98%, transparent));
+  backdrop-filter: blur(16px);
   display: grid;
-  grid-template-rows: auto auto minmax(220px, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 10px;
-  padding: 12px;
-  position: relative;
+  padding: 16px 16px 20px;
   min-width: 0;
 }
 
 .sidebar-right {
   border-left: 1px solid var(--sidebar-border);
-  background: color-mix(in srgb, var(--sidebar-bg) 92%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sidebar-bg) 92%, transparent), color-mix(in srgb, var(--sidebar-bg) 98%, transparent));
   min-width: 0;
-  transform: translateX(12px);
+  transform: translateX(8px);
   opacity: 0;
   transition: transform 220ms ease, opacity 220ms ease;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
   display: none;
 }
 
@@ -151,9 +149,9 @@ textarea {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   position: relative;
-  padding: 6px 6px 10px;
+  padding-bottom: 6px;
 }
 
 .icon-btn {
@@ -481,10 +479,10 @@ textarea {
 .chat-main {
   min-width: 0;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto;
   background: var(--chat-bg);
   background-image: var(--chat-pattern);
-  background-size: 22px 22px, cover;
+  background-size: 20px 20px, cover;
   position: relative;
   overflow: hidden;
 }
@@ -492,12 +490,12 @@ textarea {
 .chat-header.tg-chat-header {
   border-bottom: 1px solid color-mix(in srgb, var(--sidebar-border) 82%, transparent);
   background: linear-gradient(120deg, color-mix(in srgb, var(--header-bg) 90%, transparent), color-mix(in srgb, var(--accent-soft) 55%, transparent));
-  backdrop-filter: blur(12px);
-  padding: 12px 16px;
+  backdrop-filter: blur(14px);
+  padding: 16px 18px;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   position: relative;
   z-index: 4;
 }
@@ -531,18 +529,21 @@ textarea {
 .messages-layer {
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .messages {
-  min-height: 100%;
-  max-height: 100%;
+  min-height: 0;
+  width: 100%;
   overflow: auto;
-  padding: 18px 24px 80px;
+  padding: 22px 24px 92px;
   display: grid;
-  gap: 10px;
+  gap: 12px;
   background: radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--accent-soft) 32%, transparent) 0, transparent 38%),
     radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--accent-soft) 26%, transparent) 0, transparent 32%),
     var(--chat-pattern);
+  scroll-behavior: smooth;
 }
 
 .drop-overlay {
@@ -569,7 +570,9 @@ textarea {
 .message-row {
   display: flex;
   animation: messageIn 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  gap: 6px;
+  gap: 8px;
+  align-items: flex-end;
+  width: 100%;
 }
 
 .message-row.own {
@@ -581,28 +584,29 @@ textarea {
 }
 
 .message-bubble {
-  max-width: min(76ch, 80%);
-  border-radius: 15px;
-  padding: 8px 11px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
-  border: 1px solid color-mix(in srgb, var(--sidebar-border) 60%, transparent);
-  backdrop-filter: blur(2px);
+  max-width: min(76ch, 78%);
+  width: fit-content;
+  border-radius: 20px;
+  padding: 12px 14px;
+  box-shadow: 0 18px 40px rgba(3, 9, 18, 0.12);
+  border: 1px solid color-mix(in srgb, var(--sidebar-border) 70%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 .message-row.own .message-bubble {
   background: var(--bubble-own-bg);
   color: var(--bubble-own-text);
-  border-top-right-radius: 7px;
+  border-radius: 20px 20px 4px 20px;
 }
 
 .message-row.other .message-bubble {
   background: var(--bubble-other-bg);
   color: var(--bubble-other-text);
-  border-top-left-radius: 7px;
+  border-radius: 20px 20px 20px 4px;
 }
 
 .message-bubble.deleted {
-  opacity: 0.75;
+  opacity: 0.72;
 }
 
 .message-header strong {
@@ -610,18 +614,18 @@ textarea {
 }
 
 .message-bubble p {
-  margin: 5px 0;
-  font-size: 14px;
-  line-height: 1.38;
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .message-bubble code {
-  background: color-mix(in srgb, #000 22%, transparent);
-  border-radius: 6px;
-  padding: 1px 4px;
-  font-size: 12px;
+  background: color-mix(in srgb, #000 12%, transparent);
+  border-radius: 8px;
+  padding: 3px 6px;
+  font-size: 13px;
 }
 
 .attachment-wrap {
@@ -666,40 +670,45 @@ textarea {
   color: var(--bubble-meta);
 }
 
-.message-actions,
-.reactions-row {
-  margin-top: 6px;
+.message-actions {
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
 .message-actions button,
-.message-edit button,
-.reactions-row button {
+.message-edit button {
   border: 1px solid color-mix(in srgb, var(--sidebar-border) 72%, transparent);
-  background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 60%, transparent);
   color: inherit;
-  border-radius: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 13px;
   cursor: pointer;
+  transition: transform 150ms ease, background-color 150ms ease;
+}
+
+.message-actions button:hover,
+.message-edit button:hover {
+  background: color-mix(in srgb, var(--accent-soft) 72%, transparent);
+  transform: translateY(-1px);
 }
 
 .message-edit {
-  margin-top: 6px;
+  margin-top: 10px;
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 6px;
+  gap: 8px;
 }
 
 .message-edit input {
   border: 1px solid var(--input-border);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--input-bg);
   color: var(--input-text);
-  padding: 6px 8px;
+  padding: 10px 12px;
 }
 
 .typing-row {
@@ -759,20 +768,25 @@ textarea {
 
 .composer.tg-composer {
   border-top: 1px solid color-mix(in srgb, var(--sidebar-border) 84%, transparent);
-  padding: 10px 12px;
+  padding: 12px 16px;
   display: grid;
   grid-template-columns: auto 1fr auto auto;
-  gap: 8px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--header-bg) 92%, transparent), color-mix(in srgb, var(--accent-soft) 48%, transparent));
-  backdrop-filter: blur(12px);
+  gap: 10px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--header-bg) 94%, transparent), color-mix(in srgb, var(--accent-soft) 45%, transparent));
+  backdrop-filter: blur(14px);
   position: relative;
-  box-shadow: 0 -12px 28px rgba(6, 12, 20, 0.26);
+  box-shadow: 0 -12px 32px rgba(6, 12, 20, 0.24);
 }
 
 .composer textarea {
-  min-height: 42px;
+  min-height: 48px;
   max-height: 140px;
   resize: vertical;
+  border-radius: 14px;
+  border: 1px solid var(--input-border);
+  padding: 12px 14px;
+  background: var(--input-bg);
+  color: var(--input-text);
 }
 
 .emoji-btn,
@@ -1201,6 +1215,56 @@ textarea {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 1120px) {
+  .app-shell.tg-shell {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  }
+
+  .sidebar-right {
+    display: none !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .app-shell.tg-shell {
+    grid-template-columns: 1fr;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .sidebar-left {
+    border-right: none;
+    border-bottom: 1px solid var(--sidebar-border);
+    padding: 12px 14px 14px;
+    grid-template-rows: auto auto auto;
+  }
+
+  .chat-main {
+    grid-row: 2;
+  }
+
+  .sidebar-right {
+    display: none;
+  }
+
+  .tg-head {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .mobile-back {
+    display: inline-grid;
+  }
+
+  .chat-header.tg-chat-header {
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+  }
+
+  .composer.tg-composer {
+    grid-template-columns: auto 1fr auto;
   }
 }
 
