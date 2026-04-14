@@ -20,6 +20,7 @@ from schemas import (
     RegisterRequest,
     UserProfile,
 )
+from websocket import broadcast_event_to_conversation
 
 router = APIRouter()
 UPLOAD_DIR = Path("uploads")
@@ -280,6 +281,20 @@ async def create_group(
     unique_member_ids = sorted(set(payload.member_ids + [current_user["id"]]))
     pool = get_pool()
     async with pool.acquire() as conn:
+        existing_member_rows = await conn.fetch(
+            """
+            SELECT id
+            FROM users
+            WHERE id = ANY($1::BIGINT[])
+            """,
+            unique_member_ids,
+        )
+        existing_member_ids = {int(row["id"]) for row in existing_member_rows}
+        missing_member_ids = sorted(set(unique_member_ids) - existing_member_ids)
+        if missing_member_ids:
+            missing_text = ",".join(str(member_id) for member_id in missing_member_ids)
+            raise HTTPException(status_code=400, detail=f"Unknown member ids: {missing_text}")
+
         conversation = await conn.fetchrow(
             """
             INSERT INTO conversations (type, title, creator_id)
@@ -359,7 +374,7 @@ async def create_message(
             payload.attachment_name,
         )
 
-    return MessageOut(
+    created = MessageOut(
         id=row["id"],
         conversation_id=row["conversation_id"],
         sender_id=row["sender_id"],
@@ -371,6 +386,11 @@ async def create_message(
         attachment_url=row["attachment_url"],
         attachment_name=row["attachment_name"],
     )
+    await broadcast_event_to_conversation(
+        conversation_id,
+        {"event": "message:new", "data": created.model_dump(mode="json")},
+    )
+    return created
 
 
 @router.patch("/messages/{message_id}", response_model=MessageOut)
@@ -476,14 +496,31 @@ async def upload_attachment(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
 ) -> dict:
-    if file.size and file.size > 10 * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="File too large (max 10MB)")
+    max_size_bytes = 10 * 1024 * 1024
 
     suffix = Path(file.filename or "file.bin").suffix
     safe_name = f"{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{uuid4().hex}{suffix}"
     filepath = UPLOAD_DIR / safe_name
-    content = await file.read()
-    filepath.write_bytes(content)
+    written_bytes = 0
+    chunk_size = 1024 * 1024
+    try:
+        with filepath.open("wb") as destination:
+            while True:
+                chunk = await file.read(chunk_size)
+                if not chunk:
+                    break
+                written_bytes += len(chunk)
+                if written_bytes > max_size_bytes:
+                    raise HTTPException(status_code=413, detail="File too large (max 10MB)")
+                destination.write(chunk)
+    except HTTPException:
+        filepath.unlink(missing_ok=True)
+        raise
+    except Exception:
+        filepath.unlink(missing_ok=True)
+        raise
+    finally:
+        await file.close()
 
     return {
         "url": f"/uploads/{safe_name}",
@@ -493,7 +530,7 @@ async def upload_attachment(
 
 
 @router.get("/messages", response_model=list[MessageOut])
-async def get_messages() -> list[MessageOut]:
+async def get_messages(current_user: dict = Depends(get_current_user)) -> list[MessageOut]:
     # Backward-compat endpoint for MVP consumers.
     pool = get_pool()
     async with pool.acquire() as conn:
@@ -503,9 +540,12 @@ async def get_messages() -> list[MessageOut]:
                    m.created_at, m.edited_at, m.deleted_at, m.attachment_url, m.attachment_name
             FROM messages m
             JOIN users u ON u.id = m.sender_id
+            JOIN conversation_members cm ON cm.conversation_id = m.conversation_id
+            WHERE cm.user_id = $1
             ORDER BY m.created_at ASC
             LIMIT 200
-            """
+            """,
+            current_user["id"],
         )
     return [
         MessageOut(
@@ -522,4 +562,3 @@ async def get_messages() -> list[MessageOut]:
         )
         for row in rows
     ]
-

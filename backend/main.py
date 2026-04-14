@@ -5,7 +5,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from database import close_db_pool, init_db_pool
+from database import close_db_pool, init_db_pool, settings
 from routes import router
 from websocket import handle_chat_socket
 
@@ -21,7 +21,7 @@ app = FastAPI(title="Verdgram API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,4 +35,3 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, token: str | None = None):
     await handle_chat_socket(websocket, token)
-

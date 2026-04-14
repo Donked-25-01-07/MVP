@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     jwt_secret: str = "change_me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
+    cors_origins: str = "*"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        normalized = [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+        return normalized or ["*"]
 
 
 settings = Settings()
@@ -31,4 +37,3 @@ def get_pool() -> asyncpg.Pool:
     if db_pool is None:
         raise RuntimeError("Database pool is not initialized")
     return db_pool
-

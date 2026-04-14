@@ -29,6 +29,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/verdgram
 JWT_SECRET=replace_with_strong_secret
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
+CORS_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
 ```
 
 Run migrations:
@@ -46,7 +47,7 @@ uvicorn main:app --reload
 Backend endpoints:
 - `POST /auth/register`
 - `POST /auth/login`
-- `GET /messages`
+- `GET /messages` (auth required, scoped to user's conversations)
 - `WS /ws?token=<JWT>`
 
 ## 2) Frontend Setup

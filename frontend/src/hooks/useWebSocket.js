@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from 'react'
 export function useWebSocket({ token, onEvent }) {
   const wsRef = useRef(null)
   const retryTimerRef = useRef(null)
+  const onEventRef = useRef(onEvent)
   const [connected, setConnected] = useState(false)
+
+  useEffect(() => {
+    onEventRef.current = onEvent
+  }, [onEvent])
 
   useEffect(() => {
     if (!token) return undefined
@@ -19,7 +24,7 @@ export function useWebSocket({ token, onEvent }) {
       ws.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data)
-          onEvent(parsed)
+          onEventRef.current?.(parsed)
         } catch {
           // Ignore non-JSON messages in MVP mode.
         }
@@ -41,7 +46,7 @@ export function useWebSocket({ token, onEvent }) {
       if (retryTimerRef.current) window.clearTimeout(retryTimerRef.current)
       if (wsRef.current && wsRef.current.readyState < 2) wsRef.current.close()
     }
-  }, [token, onEvent])
+  }, [token])
 
   const sendEvent = (event, data = {}) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -53,4 +58,3 @@ export function useWebSocket({ token, onEvent }) {
 
   return { connected, sendEvent }
 }
-

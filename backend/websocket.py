@@ -10,7 +10,6 @@ from schemas import WsEnvelopeIn
 class ConnectionManager:
     def __init__(self) -> None:
         self.user_connections: dict[int, set[WebSocket]] = defaultdict(set)
-        self.typing_presence: dict[int, set[int]] = defaultdict(set)
 
     async def connect(self, user_id: int, websocket: WebSocket) -> None:
         await websocket.accept()
@@ -29,7 +28,7 @@ class ConnectionManager:
             for ws in self.user_connections.get(uid, set()):
                 try:
                     await ws.send_json(payload)
-                except RuntimeError:
+                except Exception:
                     stale.append((uid, ws))
         for uid, ws in stale:
             self.disconnect(uid, ws)
@@ -44,7 +43,22 @@ def parse_ws_token(token: str | None) -> dict:
     return decode_access_token(token)
 
 
-async def _conversation_member_ids(conversation_id: int) -> set[int]:
+async def is_conversation_member(user_id: int, conversation_id: int) -> bool:
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT 1
+            FROM conversation_members
+            WHERE conversation_id = $1 AND user_id = $2
+            """,
+            conversation_id,
+            user_id,
+        )
+    return row is not None
+
+
+async def conversation_member_ids(conversation_id: int) -> set[int]:
     pool = get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
@@ -56,6 +70,19 @@ async def _conversation_member_ids(conversation_id: int) -> set[int]:
             conversation_id,
         )
     return {int(row["user_id"]) for row in rows}
+
+
+async def broadcast_event_to_conversation(
+    conversation_id: int,
+    payload: dict,
+    *,
+    exclude_user_ids: set[int] | None = None,
+) -> None:
+    members = await conversation_member_ids(conversation_id)
+    if exclude_user_ids:
+        members -= exclude_user_ids
+    if members:
+        await manager.send_to_users(members, payload)
 
 
 async def _create_message(conversation_id: int, user_id: int, content: str) -> dict:
@@ -98,18 +125,44 @@ async def _create_message(conversation_id: int, user_id: int, content: str) -> d
     }
 
 
-async def _mark_message(message_id: int, user_id: int, table: str) -> None:
+async def _message_belongs_to_conversation(message_id: int, conversation_id: int) -> bool:
+    pool = get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT 1
+            FROM messages
+            WHERE id = $1 AND conversation_id = $2
+            """,
+            message_id,
+            conversation_id,
+        )
+    return row is not None
+
+
+async def _mark_message(message_id: int, user_id: int, kind: str) -> None:
+    table_name = {
+        "read": "message_reads",
+        "delivered": "message_deliveries",
+    }.get(kind)
+    if table_name is None:
+        raise ValueError(f"Unsupported marker kind: {kind}")
+
     pool = get_pool()
     async with pool.acquire() as conn:
         await conn.execute(
             f"""
-            INSERT INTO {table} (message_id, user_id)
+            INSERT INTO {table_name} (message_id, user_id)
             VALUES ($1, $2)
             ON CONFLICT (message_id, user_id) DO NOTHING
             """,
             message_id,
             user_id,
         )
+
+
+async def _send_forbidden_event(websocket: WebSocket) -> None:
+    await websocket.send_json({"event": "error", "data": {"detail": "Not a conversation member"}})
 
 
 async def handle_chat_socket(websocket: WebSocket, token: str | None) -> None:
@@ -132,38 +185,55 @@ async def handle_chat_socket(websocket: WebSocket, token: str | None) -> None:
                 continue
 
             if envelope.event == "typing:start" and envelope.conversation_id:
-                members = await _conversation_member_ids(envelope.conversation_id)
-                await manager.send_to_users(
-                    members - {user_id},
+                if not await is_conversation_member(user_id, envelope.conversation_id):
+                    await _send_forbidden_event(websocket)
+                    continue
+                await broadcast_event_to_conversation(
+                    envelope.conversation_id,
                     {
                         "event": "typing:start",
                         "data": {"conversation_id": envelope.conversation_id, "user_id": user_id, "username": username},
                     },
+                    exclude_user_ids={user_id},
                 )
                 continue
 
             if envelope.event == "typing:stop" and envelope.conversation_id:
-                members = await _conversation_member_ids(envelope.conversation_id)
-                await manager.send_to_users(
-                    members - {user_id},
+                if not await is_conversation_member(user_id, envelope.conversation_id):
+                    await _send_forbidden_event(websocket)
+                    continue
+                await broadcast_event_to_conversation(
+                    envelope.conversation_id,
                     {
                         "event": "typing:stop",
-                        "data": {"conversation_id": envelope.conversation_id, "user_id": user_id},
+                        "data": {"conversation_id": envelope.conversation_id, "user_id": user_id, "username": username},
                     },
+                    exclude_user_ids={user_id},
                 )
                 continue
 
             if envelope.event == "message:new" and envelope.conversation_id and envelope.content:
-                message = await _create_message(envelope.conversation_id, user_id, envelope.content)
-                members = await _conversation_member_ids(envelope.conversation_id)
-                await manager.send_to_users(members, {"event": "message:new", "data": message})
+                try:
+                    message = await _create_message(envelope.conversation_id, user_id, envelope.content)
+                except HTTPException as exc:
+                    await websocket.send_json({"event": "error", "data": {"detail": exc.detail}})
+                    continue
+                await broadcast_event_to_conversation(
+                    envelope.conversation_id,
+                    {"event": "message:new", "data": message},
+                )
                 continue
 
             if envelope.event == "message:read" and envelope.message_id and envelope.conversation_id:
-                await _mark_message(envelope.message_id, user_id, "message_reads")
-                members = await _conversation_member_ids(envelope.conversation_id)
-                await manager.send_to_users(
-                    members,
+                if not await is_conversation_member(user_id, envelope.conversation_id):
+                    await _send_forbidden_event(websocket)
+                    continue
+                if not await _message_belongs_to_conversation(envelope.message_id, envelope.conversation_id):
+                    await websocket.send_json({"event": "error", "data": {"detail": "Message/conversation mismatch"}})
+                    continue
+                await _mark_message(envelope.message_id, user_id, "read")
+                await broadcast_event_to_conversation(
+                    envelope.conversation_id,
                     {
                         "event": "message:read",
                         "data": {"message_id": envelope.message_id, "conversation_id": envelope.conversation_id, "user_id": user_id},
@@ -172,10 +242,15 @@ async def handle_chat_socket(websocket: WebSocket, token: str | None) -> None:
                 continue
 
             if envelope.event == "message:delivered" and envelope.message_id and envelope.conversation_id:
-                await _mark_message(envelope.message_id, user_id, "message_deliveries")
-                members = await _conversation_member_ids(envelope.conversation_id)
-                await manager.send_to_users(
-                    members,
+                if not await is_conversation_member(user_id, envelope.conversation_id):
+                    await _send_forbidden_event(websocket)
+                    continue
+                if not await _message_belongs_to_conversation(envelope.message_id, envelope.conversation_id):
+                    await websocket.send_json({"event": "error", "data": {"detail": "Message/conversation mismatch"}})
+                    continue
+                await _mark_message(envelope.message_id, user_id, "delivered")
+                await broadcast_event_to_conversation(
+                    envelope.conversation_id,
                     {
                         "event": "message:delivered",
                         "data": {"message_id": envelope.message_id, "conversation_id": envelope.conversation_id, "user_id": user_id},
@@ -187,4 +262,3 @@ async def handle_chat_socket(websocket: WebSocket, token: str | None) -> None:
     except Exception:
         manager.disconnect(user_id, websocket)
         await websocket.close(code=1011)
-
