@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  font-family: Manrope, "SF Pro Text", "Segoe UI", sans-serif;
+  font-family: "Manrope", "SF Pro Display", "Segoe UI", sans-serif;
 }
 
 *,
@@ -24,7 +24,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -97,10 +98,10 @@ select {
   font-size: 14px;
 }
 
-.app-shell {
+.app-shell.tg-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(300px, 370px) 1fr;
+  grid-template-columns: minmax(290px, 360px) 1fr minmax(280px, 340px);
   background: var(--page-gradient);
   color: var(--text);
 }
@@ -109,67 +110,80 @@ select {
   border-right: 1px solid var(--sidebar-border);
   background: var(--sidebar-bg);
   display: grid;
-  grid-template-rows: auto auto minmax(240px, 1fr) auto auto;
-  padding: 18px 14px 14px;
-  gap: 12px;
-  backdrop-filter: blur(18px);
+  grid-template-rows: auto auto minmax(220px, 1fr) auto;
+  gap: 10px;
+  padding: 12px;
+  position: relative;
+  min-width: 0;
+}
+
+.sidebar-right {
+  border-left: 1px solid var(--sidebar-border);
+  background: color-mix(in srgb, var(--sidebar-bg) 92%, transparent);
+  display: none;
+  min-width: 0;
+}
+
+.sidebar-right.open {
+  display: block;
+}
+
+.tg-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
   position: relative;
 }
 
-.sidebar-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
+.icon-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: none;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card-bg) 84%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease;
 }
 
-.brand-title {
-  margin: 0;
-  font-size: 28px;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+.icon-btn:hover {
+  transform: translateY(-1px);
+  background: var(--card-hover);
 }
 
-.brand-subtitle {
-  margin: 6px 0 0;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.connection-pill {
+.avatar-pill {
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 12px;
-  white-space: nowrap;
-  transition: background-color 220ms ease, color 220ms ease;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--accent-soft) 75%, transparent);
+  color: var(--text);
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  font-weight: 700;
 }
 
-.connection-pill.online {
-  background: rgba(81, 193, 142, 0.16);
-  color: var(--success);
+.avatar-pill img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.connection-pill.offline {
-  background: rgba(255, 107, 107, 0.12);
-  color: var(--danger);
-}
-
-.toolbar {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.select-wrap {
-  display: grid;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.select-wrap select,
 .search-input,
-.composer input {
+.menu-inline select,
+.settings-block input,
+.settings-block textarea,
+.settings-block button,
+.modal-card input,
+.modal-card textarea,
+.composer textarea {
+  width: 100%;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 11px;
@@ -178,25 +192,103 @@ select {
   outline: none;
 }
 
-.select-wrap select:focus-visible,
 .search-input:focus-visible,
-.composer input:focus-visible,
+.menu-inline select:focus-visible,
+.settings-block input:focus-visible,
+.settings-block textarea:focus-visible,
+.modal-card input:focus-visible,
+.modal-card textarea:focus-visible,
+.composer textarea:focus-visible,
 .message-edit input:focus-visible {
   border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 24%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent);
 }
 
-.section {
-  min-height: 0;
+.dropdown-card {
+  border: 1px solid var(--sidebar-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  box-shadow: 0 20px 46px rgba(8, 14, 22, 0.32);
   display: grid;
-  gap: 10px;
+  gap: 4px;
+  padding: 8px;
+  animation: menuIn 160ms ease;
 }
 
-.section-title {
+.main-dropdown {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.chat-dropdown {
+  position: absolute;
+  right: 16px;
+  top: 52px;
+  width: min(260px, 70vw);
+  z-index: 18;
+}
+
+.dropdown-card button,
+.menu-inline {
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  padding: 8px 10px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-card button:hover,
+.menu-inline:hover {
+  background: color-mix(in srgb, var(--accent-soft) 58%, transparent);
+}
+
+.menu-inline {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.menu-inline select {
+  padding: 7px 10px;
+}
+
+.danger-row {
+  color: var(--danger) !important;
+}
+
+.dropdown-split {
+  height: 1px;
+  background: color-mix(in srgb, var(--sidebar-border) 70%, transparent);
+  margin: 4px 0;
+}
+
+.folder-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.folder-btn {
+  border: 1px solid var(--sidebar-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--card-bg) 84%, transparent);
   color: var(--text-muted);
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  padding: 6px 9px;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.folder-btn.active {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .conversation-list {
@@ -207,34 +299,40 @@ select {
   padding-right: 2px;
 }
 
-.empty-list {
-  margin: 6px 4px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.conversation-card {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  text-align: left;
+.conversation-card.tg-card {
   border: 1px solid transparent;
   border-radius: 14px;
   background: var(--card-bg);
   color: inherit;
-  padding: 10px 11px;
+  padding: 9px;
   cursor: pointer;
-  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 10px;
+  text-align: left;
+  align-items: center;
+  transition: background-color 170ms ease, border-color 170ms ease, transform 170ms ease;
 }
 
-.conversation-card:hover {
+.conversation-card.tg-card:hover {
   background: var(--card-hover);
 }
 
-.conversation-card.active {
-  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
-  background: color-mix(in srgb, var(--accent-soft) 58%, var(--card-bg));
+.conversation-card.tg-card.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent-soft) 60%, var(--card-bg));
   transform: translateX(1px);
+}
+
+.conversation-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent-soft) 68%, transparent);
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .conversation-main {
@@ -251,7 +349,7 @@ select {
 }
 
 .conversation-main p {
-  margin: 5px 0 0;
+  margin: 4px 0 0;
   font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
@@ -263,7 +361,7 @@ select {
   display: grid;
   justify-items: end;
   align-content: start;
-  gap: 6px;
+  gap: 5px;
 }
 
 .conversation-meta small {
@@ -275,114 +373,29 @@ select {
   background: var(--badge-bg);
   color: var(--badge-text);
   border-radius: 999px;
-  font-size: 12px;
-  line-height: 1;
   min-width: 21px;
   height: 21px;
   display: inline-grid;
   place-items: center;
   padding: 0 6px;
-  font-weight: 700;
-}
-
-.quick-actions {
-  border: 1px solid var(--sidebar-border);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--card-bg) 78%, transparent);
-  padding: 10px;
-  display: grid;
-  gap: 8px;
-}
-
-.users-list {
-  display: grid;
-  gap: 6px;
-  max-height: 140px;
-  overflow: auto;
-}
-
-.user-row {
-  border: none;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--card-bg) 74%, transparent);
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 9px;
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.user-row:hover {
-  background: color-mix(in srgb, var(--accent-soft) 60%, var(--card-bg));
-}
-
-.user-row small {
-  color: var(--text-muted);
   font-size: 12px;
-}
-
-.user-row em {
-  font-style: normal;
-  font-size: 11px;
-  color: var(--accent);
-}
-
-.members-pick {
-  max-height: 108px;
-  overflow: auto;
-  background: color-mix(in srgb, var(--card-bg) 80%, transparent);
-  border: 1px solid var(--sidebar-border);
-  border-radius: 10px;
-  padding: 6px 8px;
-  display: grid;
-  gap: 5px;
-}
-
-.members-pick label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.members-pick input {
-  accent-color: var(--accent);
-}
-
-.create-group-btn {
-  border: none;
-  border-radius: 11px;
-  padding: 9px 10px;
-  background: var(--accent);
-  color: var(--badge-text);
   font-weight: 700;
-  cursor: pointer;
-  transition: background-color 160ms ease, transform 160ms ease;
-}
-
-.create-group-btn:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
 }
 
 .sidebar-foot {
-  margin-top: 2px;
   display: grid;
   gap: 8px;
 }
 
 .notifications {
-  background: color-mix(in srgb, var(--card-bg) 82%, transparent);
   border: 1px solid var(--sidebar-border);
   border-radius: 11px;
+  background: color-mix(in srgb, var(--card-bg) 88%, transparent);
   padding: 8px 10px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
-  align-items: center;
   font-size: 13px;
 }
 
@@ -390,64 +403,92 @@ select {
   color: var(--text-muted);
 }
 
-.profile-row {
+.profile-row.tg-profile {
   border: 1px solid var(--sidebar-border);
   border-radius: 11px;
+  background: color-mix(in srgb, var(--card-bg) 88%, transparent);
   padding: 8px 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  background: color-mix(in srgb, var(--card-bg) 82%, transparent);
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .profile-row p {
   margin: 2px 0 0;
-  color: var(--text-muted);
   font-size: 12px;
+  color: var(--text-muted);
 }
 
-.logout-btn {
-  border: none;
-  border-radius: 9px;
-  padding: 7px 10px;
-  background: color-mix(in srgb, var(--danger) 20%, transparent);
+.connection-pill {
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.connection-pill.online {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+}
+
+.connection-pill.offline {
   color: var(--danger);
-  font-weight: 700;
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+}
+
+.fab-new {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: var(--badge-text);
+  font-size: 20px;
   cursor: pointer;
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .chat-main {
   min-width: 0;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr auto auto;
   background: var(--chat-bg);
   background-image: var(--chat-pattern);
   background-size: 22px 22px, cover;
   position: relative;
 }
 
-.chat-header {
-  border-bottom: 1px solid color-mix(in srgb, var(--sidebar-border) 84%, transparent);
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.chat-header.tg-chat-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--sidebar-border) 82%, transparent);
   background: var(--header-bg);
   backdrop-filter: blur(12px);
-  z-index: 2;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 4;
 }
 
-.chat-header h2 {
+.chat-head-main h2 {
   margin: 0;
-  font-size: 19px;
-  letter-spacing: -0.01em;
+  font-size: 18px;
 }
 
-.chat-header p {
+.chat-head-main p {
   margin: 2px 0 0;
   color: var(--text-muted);
   font-size: 13px;
+}
+
+.chat-head-actions {
+  display: inline-flex;
+  gap: 6px;
 }
 
 .mobile-back {
@@ -469,9 +510,30 @@ select {
   min-height: 100%;
   max-height: 100%;
   overflow: auto;
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: grid;
   gap: 8px;
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 56px 0 0;
+  display: none;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent-soft) 50%, rgba(10, 17, 27, 0.45));
+  backdrop-filter: blur(5px);
+  z-index: 8;
+}
+
+.drop-overlay.show {
+  display: grid;
+}
+
+.drop-overlay span {
+  border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: 12px;
+  padding: 16px 20px;
+  background: color-mix(in srgb, var(--card-bg) 85%, transparent);
 }
 
 .message-row {
@@ -488,7 +550,7 @@ select {
 }
 
 .message-bubble {
-  max-width: min(76ch, 76%);
+  max-width: min(76ch, 80%);
   border-radius: 15px;
   padding: 8px 11px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13);
@@ -522,9 +584,27 @@ select {
   word-break: break-word;
 }
 
+.message-bubble code {
+  background: color-mix(in srgb, #000 22%, transparent);
+  border-radius: 6px;
+  padding: 1px 4px;
+  font-size: 12px;
+}
+
+.attachment-wrap {
+  display: grid;
+  gap: 5px;
+}
+
+.message-image,
+.message-video {
+  max-width: min(300px, 100%);
+  border-radius: 10px;
+  display: block;
+}
+
 .attachment-link {
   display: inline-flex;
-  margin-top: 4px;
   color: inherit;
   font-size: 13px;
   text-underline-offset: 2px;
@@ -544,15 +624,27 @@ select {
   font-style: normal;
 }
 
-.message-actions {
+.status-mark.read {
+  color: #64b6ff;
+}
+
+.status-mark.delivered,
+.status-mark.sent {
+  color: var(--bubble-meta);
+}
+
+.message-actions,
+.reactions-row {
   margin-top: 6px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 6px;
 }
 
 .message-actions button,
-.message-edit button {
+.message-edit button,
+.reactions-row button {
   border: 1px solid color-mix(in srgb, var(--sidebar-border) 72%, transparent);
   background: color-mix(in srgb, var(--card-bg) 55%, transparent);
   color: inherit;
@@ -590,7 +682,6 @@ select {
   border-radius: 12px;
   padding: 10px 12px;
   min-width: 48px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
 .typing-bubble span {
@@ -609,18 +700,64 @@ select {
   animation-delay: 0.4s;
 }
 
-.composer {
+.reply-banner {
+  border-top: 1px solid color-mix(in srgb, var(--sidebar-border) 85%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--sidebar-border) 85%, transparent);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: color-mix(in srgb, var(--card-bg) 82%, transparent);
+}
+
+.reply-banner p {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.reply-banner button {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.composer.tg-composer {
   border-top: 1px solid color-mix(in srgb, var(--sidebar-border) 84%, transparent);
-  padding: 10px 14px 12px;
+  padding: 10px 12px;
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto;
   gap: 8px;
   background: var(--header-bg);
   backdrop-filter: blur(12px);
+  position: relative;
 }
 
-.composer input {
+.composer textarea {
   min-height: 42px;
+  max-height: 140px;
+  resize: vertical;
+}
+
+.emoji-btn,
+.send-btn {
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+}
+
+.emoji-btn {
+  background: color-mix(in srgb, var(--card-bg) 82%, transparent);
+  color: var(--text);
+}
+
+.send-btn {
+  background: var(--accent);
+  color: var(--badge-text);
 }
 
 .attach-btn {
@@ -634,44 +771,43 @@ select {
   justify-content: center;
   padding: 0 13px;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 160ms ease, border-color 160ms ease;
-}
-
-.attach-btn:hover {
-  background: color-mix(in srgb, var(--accent-soft) 54%, var(--input-bg));
-  border-color: color-mix(in srgb, var(--accent) 36%, var(--input-border));
 }
 
 .attach-btn input {
   display: none;
 }
 
-.composer button[type="submit"] {
-  min-height: 42px;
+.emoji-picker {
+  position: absolute;
+  left: 10px;
+  bottom: calc(100% + 8px);
+  border: 1px solid var(--sidebar-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  box-shadow: 0 18px 40px rgba(10, 16, 24, 0.3);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  padding: 8px;
+  z-index: 12;
+}
+
+.emoji-picker button {
   border: none;
-  border-radius: 11px;
-  background: var(--accent);
-  color: var(--badge-text);
-  font-weight: 700;
+  border-radius: 8px;
+  background: transparent;
   cursor: pointer;
-  padding: 0 16px;
-  transition: background-color 160ms ease;
+  padding: 4px;
 }
 
-.composer button[type="submit"]:hover {
-  background: var(--accent-hover);
-}
-
-.composer button[type="submit"]:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.emoji-picker button:hover {
+  background: color-mix(in srgb, var(--accent-soft) 58%, transparent);
 }
 
 .attachment-chip {
   grid-column: 1 / -1;
   border: 1px solid var(--sidebar-border);
-  background: color-mix(in srgb, var(--card-bg) 78%, transparent);
+  background: color-mix(in srgb, var(--card-bg) 80%, transparent);
   border-radius: 10px;
   padding: 7px 9px;
   display: flex;
@@ -684,10 +820,16 @@ select {
 .attachment-chip button {
   border: none;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  background: color-mix(in srgb, var(--danger) 20%, transparent);
   color: var(--danger);
   padding: 5px 8px;
   cursor: pointer;
+}
+
+.attachment-hint {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 12px;
 }
 
 .empty-chat {
@@ -706,6 +848,265 @@ select {
 
 .empty-chat p {
   margin: 0;
+  color: var(--text-muted);
+}
+
+.info-panel {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.info-top {
+  border-bottom: 1px solid var(--sidebar-border);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-top h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.settings-block {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--sidebar-border) 70%, transparent);
+}
+
+.settings-block h4,
+.settings-block label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.settings-block button {
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--badge-text);
+  cursor: pointer;
+}
+
+.mini-list {
+  max-height: 190px;
+  overflow: auto;
+  display: grid;
+  gap: 6px;
+}
+
+.mini-list button,
+.participant-row {
+  border: 1px solid color-mix(in srgb, var(--sidebar-border) 68%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card-bg) 80%, transparent);
+  padding: 7px 8px;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+  color: inherit;
+}
+
+.mini-list button {
+  cursor: pointer;
+}
+
+.mini-list span,
+.participant-row small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.media-tile {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sidebar-border);
+  background: color-mix(in srgb, var(--card-bg) 80%, transparent);
+  min-height: 74px;
+  display: grid;
+  place-items: center;
+  color: inherit;
+  text-decoration: none;
+  font-size: 11px;
+  padding: 8px;
+}
+
+.media-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 10, 16, 0.6);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+
+.modal-card {
+  width: min(460px, 92vw);
+  max-height: 86vh;
+  overflow: auto;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sidebar-bg) 95%, transparent);
+  box-shadow: 0 28px 62px rgba(6, 10, 18, 0.45);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  animation: modalIn 200ms ease;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-head h3 {
+  margin: 0;
+}
+
+.users-list {
+  display: grid;
+  gap: 6px;
+  max-height: 150px;
+  overflow: auto;
+}
+
+.user-row {
+  border: 1px solid var(--sidebar-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card-bg) 78%, transparent);
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.user-row small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.user-row em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.members-pick {
+  max-height: 120px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--card-bg) 80%, transparent);
+  border: 1px solid var(--sidebar-border);
+  border-radius: 10px;
+  padding: 6px 8px;
+  display: grid;
+  gap: 5px;
+}
+
+.members-pick label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.members-pick input {
+  accent-color: var(--accent);
+}
+
+.create-group-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: var(--accent);
+  color: var(--badge-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-modal label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.avatar-uploader {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-preview {
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--sidebar-border);
+  background: color-mix(in srgb, var(--accent-soft) 72%, transparent);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feedback-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 16px 34px rgba(9, 15, 24, 0.32);
+  z-index: 80;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.feedback-toast.success {
+  background: color-mix(in srgb, var(--success) 26%, #0f1b18);
+  color: #d9f6e8;
+}
+
+.feedback-toast.error {
+  background: color-mix(in srgb, var(--danger) 24%, #231417);
+  color: #ffd7df;
+}
+
+.feedback-toast button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.empty-list {
+  margin: 6px 4px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
@@ -733,8 +1134,46 @@ select {
   }
 }
 
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 1200px) {
+  .app-shell.tg-shell {
+    grid-template-columns: minmax(290px, 360px) 1fr;
+  }
+
+  .sidebar-right {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(320px, 92vw);
+    z-index: 40;
+    box-shadow: -20px 0 45px rgba(7, 11, 18, 0.35);
+  }
+}
+
 @media (max-width: 960px) {
-  .app-shell {
+  .app-shell.tg-shell {
     grid-template-columns: 1fr;
   }
 
@@ -758,19 +1197,11 @@ select {
 
 @media (max-width: 680px) {
   .sidebar-left {
-    padding: 14px 10px 10px;
+    padding: 10px;
   }
 
-  .brand-title {
-    font-size: 24px;
-  }
-
-  .toolbar {
-    grid-template-columns: 1fr;
-  }
-
-  .conversation-card {
-    padding: 9px 10px;
+  .folder-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .messages {
@@ -781,13 +1212,12 @@ select {
     max-width: 92%;
   }
 
-  .composer {
-    grid-template-columns: 1fr;
+  .composer.tg-composer {
+    grid-template-columns: 1fr auto auto;
   }
 
-  .attach-btn,
-  .composer button[type="submit"] {
-    width: 100%;
+  .emoji-btn {
+    display: none;
   }
 }
 

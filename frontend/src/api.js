@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
+const MEDIA_BASE = (API_BASE || '').replace(/\/api\/?$/i, '')
 
 export async function api(path, { token, method = 'GET', body, isForm = false } = {}) {
   const headers = {}
@@ -17,4 +18,10 @@ export async function api(path, { token, method = 'GET', body, isForm = false } 
   }
   if (response.status === 204) return null
   return response.json()
+}
+
+export function resolveMediaUrl(path) {
+  if (!path) return null
+  if (/^https?:\/\//i.test(path)) return path
+  return `${MEDIA_BASE}${path}`
 }
